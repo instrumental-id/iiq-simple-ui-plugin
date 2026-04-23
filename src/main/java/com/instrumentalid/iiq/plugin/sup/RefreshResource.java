@@ -1,7 +1,9 @@
 package com.instrumentalid.iiq.plugin.sup;
 
+import com.instrumentalid.iiq.plugin.sup.dto.ErrorResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import sailpoint.api.Meter;
 import sailpoint.rest.plugin.BasePluginResource;
 import sailpoint.rest.plugin.RequiredRight;
 import sailpoint.tools.ObjectNotFoundException;
@@ -22,41 +24,44 @@ import javax.ws.rs.core.Response;
 public class RefreshResource extends BasePluginResource {
     private static final Log log = LogFactory.getLog(RefreshResource.class);
 
+    private static Response handleRequest(String meterString, RestMethodHandler handler) {
+        Meter.enterByName(meterString);
+        try {
+            var output = handler.handle();
+            if (output == null) {
+                return Response.ok().build();
+            } else {
+                return Response.ok(output).build();
+            }
+        } catch (Exception e) {
+            log.error("Error handling request", e);
+            return Response.serverError().entity(new ErrorResponse(e)).build();
+        } finally {
+            Meter.exitByName(meterString);
+        }
+    }
+
     @GET
     @Path("/configuration")
     @RequiredRight("IID_SUP_RefreshButtons")
     public Response fetchConfigurations() {
-        try {
-            // TODO: timing / metering
+        return handleRequest("SUP.fetchConfiguration", () -> {
             RefreshService service = new RefreshService(getContext(), getLoggedInUser(), this);
-            return Response.ok(service.getConfigurations()).build();
-        } catch(Exception e) {
-            log.error("Could not fetch configurations", e);
-            // TODO: Do we want to return more error details here?
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
+            return service.getConfigurations();
+        });
     }
 
     @POST
     @Path("/refresh/{type}/{targetIdentityId}")
     @RequiredRight("IID_SUP_RefreshButtons")
     public Response handleRefreshButton(@PathParam("type") String type, @PathParam("targetIdentityId") String targetIdentityId) {
-        try {
-            // TODO: audit
-            // TODO: timing / metering
-            // TODO: testing
+        var meterString = "SUP.refresh." + type;
+        return handleRequest(meterString, () -> {
             log.info("Logged in user " + getLoggedInUser().getName() + " is refreshing identity " + targetIdentityId + " using button type " + type);
             RefreshService service = new RefreshService(getContext(), getLoggedInUser(), this);
             service.refreshIdentity(type, targetIdentityId);
-            return Response.ok().build();
-        } catch(ObjectNotFoundException e) {
-            log.warn("Could not find Identity " + e.getObjectIdentifier() + " for refresh operation", e);
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getObjectClass().getName() + ": " + e.getObjectIdentifier()).build();
-        } catch(Exception e) {
-            log.error("Could not handle refresh button", e);
-            // TODO: Do we want to return more error details here?
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
+            return null;
+        });
     }
 
     @Override

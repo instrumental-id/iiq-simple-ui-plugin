@@ -6,9 +6,11 @@ import org.apache.commons.logging.LogFactory;
 import sailpoint.api.Identitizer;
 import sailpoint.api.SailPointContext;
 import sailpoint.object.Attributes;
+import sailpoint.object.AuditEvent;
 import sailpoint.object.Configuration;
 import sailpoint.object.Identity;
 import sailpoint.plugin.PluginContext;
+import sailpoint.server.Auditor;
 import sailpoint.tools.GeneralException;
 import sailpoint.tools.ObjectNotFoundException;
 import sailpoint.tools.Util;
@@ -95,6 +97,16 @@ public class RefreshService {
         refreshOptions.putAll(options);
         refreshOptions.put(Identitizer.ARG_REFRESH_SOURCE, "webservice");
         refreshOptions.put(Identitizer.ARG_REFRESH_SOURCE_WHO, loggedInUser.getName());
+
+        // Audit that this happened so we can report on it
+        AuditEvent ae = new AuditEvent();
+        ae.setAction("supRefreshIdentity");
+        ae.setTarget(targetIdentity.getName());
+        ae.setSource(loggedInUser.getName());
+        ae.setString1(type);
+        ae.setAttribute("options", refreshOptions);
+
+        Auditor.log(ae);
 
         refreshIdentityInternal(targetIdentity, refreshOptions);
     }
