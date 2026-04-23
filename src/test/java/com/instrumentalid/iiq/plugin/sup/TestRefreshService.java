@@ -36,7 +36,7 @@ public class TestRefreshService {
         button.put("type", "testType");
         button.put("icon", "testIcon");
         button.put("rightRequired", "testRight");
-        button.put("options", Map.of("option1", "value1"));
+        button.put("refreshOptions", Map.of("option1", "value1"));
         buttonsList.add(button);
 
         config.put("Refresh Buttons", buttonsList);
@@ -74,7 +74,7 @@ public class TestRefreshService {
         button.put("type", "testType");
         button.put("icon", "testIcon");
         button.put("rightRequired", "testRight");
-        button.put("options", Map.of(Identitizer.ARG_CHECK_HISTORY, "true"));
+        button.put("refreshOptions", Map.of(Identitizer.ARG_CHECK_HISTORY, "true"));
         buttonsList.add(button);
 
         config.put("Refresh Buttons", buttonsList);
