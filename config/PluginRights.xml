@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+    <SPRight name="IID_SUP_RefreshButtons" displayName="Simple UI Plugin: refresh buttons">
+        <Description>Allows this user to see any refresh buttons</Description>
+    </SPRight>
+
+    <Capability name="IID_SUP_RefreshButtons" displayName="Simple UI Plugin: refresh buttons">
+        <Description>Allows this user to see Identity Warehouse refresh buttons</Description>
+        <RightRefs>
+            <Reference class="sailpoint.object.SPRight" name="IID_SUP_RefreshButtons"/>
+        </RightRefs>
+    </Capability>
+</sailpoint>

@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Plugin PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Plugin certificationLevel="None" displayName="IID Simple UI Plugin" minSystemVersion="8.4" name="IIDSimpleUIPlugin" version="%%BUILD_VERSION%%">
+    <Attributes>
+        <Map>
+            <entry key="minUpgradableVersion" value="1.0" />
+            <entry key="restResources">
+                <value>
+                    <List>
+                        <String>com.instrumentalid.iiq.plugin.sup.RefreshResource</String>
+                    </List>
+                </value>
+            </entry>
+            <entry key="snippets">
+                <value>
+                    <List>
+                        <Snippet regexPattern="^(.*(define/identity/identity.jsf)).*" rightRequired="IID_SUP_RefreshButtons">
+                            <Scripts>
+                                <String>ui/js/bundle.js</String>
+                            </Scripts>
+                            <StyleSheets>
+                                <String>ui/css/sup-plugin.css</String>
+                            </StyleSheets>
+                        </Snippet>
+                    </List>
+                </value>
+            </entry>
+            <entry key="settings">
+                <value>
+                    <List>
+                        <Setting dataType="string" label="Configuration Object" name="configurationObject" defaultValue="SUP Configuration"/>
+                    </List>
+                </value>
+            </entry>
+        </Map>
+    </Attributes>
+</Plugin>

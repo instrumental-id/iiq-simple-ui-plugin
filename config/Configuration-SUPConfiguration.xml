@@ -1,0 +1,74 @@
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+    <ImportAction name="merge">
+        <Configuration name="SUP Configuration">
+            <Attributes>
+                <Map>
+                    <entry key="Refresh Buttons">
+                        <value>
+                            <List>
+                                <Map>
+                                    <entry key="label" value="Full Refresh"/>
+                                    <entry key="icon" value="fa fa-refresh"/>
+                                    <entry key="type" value="full"/>
+                                    <entry key="refreshOptions">
+                                        <value>
+                                            <Map>
+                                                <entry key="promoteAttributes" value="true"/>
+                                                <entry key="provision" value="true"/>
+                                                <entry key="correlateEntitlements" value="true"/>
+                                                <entry key="processTriggers" value="true"/>
+                                                <entry key="synchronizeAttributes" value="true"/>
+                                                <entry key="refreshProvisioningRequests" value="true"/>
+                                                <entry key="refreshManagerStatus" value="true"/>
+                                                <entry key="refreshIdentityEntitlements" value="true"/>
+                                            </Map>
+                                        </value>
+                                    </entry>
+                                </Map>
+                                <Map>
+                                    <entry key="label" value="Role Refresh"/>
+                                    <entry key="icon" value="fa fa-users"/>
+                                    <entry key="type" value="role"/>
+                                    <entry key="refreshOptions">
+                                        <value>
+                                            <Map>
+                                                <entry key="promoteAttributes" value="false"/>
+                                                <entry key="provision" value="true"/>
+                                                <entry key="correlateEntitlements" value="true"/>
+                                                <entry key="processTriggers" value="false"/>
+                                                <entry key="synchronizeAttributes" value="false"/>
+                                                <entry key="refreshProvisioningRequests" value="false"/>
+                                                <entry key="refreshManagerStatus" value="false"/>
+                                                <entry key="refreshIdentityEntitlements" value="false"/>
+                                            </Map>
+                                        </value>
+                                    </entry>
+                                </Map>
+                                <Map>
+                                    <entry key="label" value="Process Events"/>
+                                    <entry key="icon" value="fa fa-gears"/>
+                                    <entry key="type" value="processEvents"/>
+                                    <entry key="refreshOptions">
+                                        <value>
+                                            <Map>
+                                                <entry key="promoteAttributes" value="false"/>
+                                                <entry key="provision" value="false"/>
+                                                <entry key="correlateEntitlements" value="false"/>
+                                                <entry key="processTriggers" value="true"/>
+                                                <entry key="synchronizeAttributes" value="false"/>
+                                                <entry key="refreshProvisioningRequests" value="false"/>
+                                                <entry key="refreshManagerStatus" value="false"/>
+                                                <entry key="refreshIdentityEntitlements" value="false"/>
+                                            </Map>
+                                        </value>
+                                    </entry>
+                                </Map>
+                            </List>
+                        </value>
+                    </entry>
+                </Map>
+            </Attributes>
+        </Configuration>
+    </ImportAction>
+</sailpoint>
