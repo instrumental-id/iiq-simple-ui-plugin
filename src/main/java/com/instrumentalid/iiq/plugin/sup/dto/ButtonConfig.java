@@ -53,9 +53,4 @@ public class ButtonConfig {
     public String getType() {
         return type;
     }
-
-    public boolean isUserAllowed(Identity user) {
-        // TODO
-        return false;
-    }
 }
