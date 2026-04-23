@@ -3,6 +3,7 @@ package com.instrumentalid.iiq.plugin.sup;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import sailpoint.rest.plugin.BasePluginResource;
+import sailpoint.rest.plugin.RequiredRight;
 import sailpoint.tools.ObjectNotFoundException;
 
 import javax.ws.rs.*;
@@ -23,7 +24,7 @@ public class RefreshResource extends BasePluginResource {
 
     @GET
     @Path("/configuration")
-    //@RequiredRight("IID_SUP_RefreshButtons")
+    @RequiredRight("IID_SUP_RefreshButtons")
     public Response fetchConfigurations() {
         try {
             // TODO: timing / metering
@@ -38,6 +39,7 @@ public class RefreshResource extends BasePluginResource {
 
     @POST
     @Path("/refresh/{type}/{targetIdentityId}")
+    @RequiredRight("IID_SUP_RefreshButtons")
     public Response handleRefreshButton(@PathParam("type") String type, @PathParam("targetIdentityId") String targetIdentityId) {
         try {
             // TODO: audit
