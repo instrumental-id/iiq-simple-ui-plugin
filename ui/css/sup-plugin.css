@@ -1,3 +1,8 @@
-.supPluginButton {
+.sup-plugin-button-container {
+    margin-left: 45px;
+    display: flex;
+}
 
+.sup-plugin-button-container button {
+    margin-right: 3px;
 }

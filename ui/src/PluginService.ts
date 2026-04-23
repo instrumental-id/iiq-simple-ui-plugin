@@ -4,8 +4,14 @@ declare var PluginHelper: IPluginHelper;
 
 const CSRF_COOKIE_NAME = 'CSRF-TOKEN';
 
+export interface Configuration {
+    buttons: ButtonInfo[]
+}
+
 export interface ButtonInfo {
-    // TODO
+    label: string;
+    type: string;
+    icon: string;
 }
 
 export class PluginService {
@@ -16,8 +22,40 @@ export class PluginService {
     }
 
     private formatUrl(path: string): string {
-        return PluginHelper.getPluginRestUrl("about-plugin/" + path);
+        return PluginHelper.getPluginRestUrl("simple-ui-plugin/" + path);
     }
 
+    async getConfiguration(): Promise<Configuration> {
+        const url = this.formatUrl("configuration");
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "X-XSRF-TOKEN": this.getCookie(CSRF_COOKIE_NAME) ?? ""
+            }
+        });
 
+        if (response.ok) {
+            return await response.json() as Configuration;
+        } else {
+            console.error("Error response from web service", response.status, response.statusText);
+            throw new Error(`Failed to fetch configuration: ${response.status} ${response.statusText}`);
+        }
+    }
+
+    async performRefresh(type: string, targetIdentityId: string): Promise<void> {
+        const sanitizedType = encodeURIComponent(type);
+        const sanitizedTargetIdentityId = encodeURIComponent(targetIdentityId);
+        const url = this.formatUrl("refresh/" + sanitizedType + "/" + sanitizedTargetIdentityId);
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-XSRF-TOKEN": this.getCookie(CSRF_COOKIE_NAME) ?? ""
+            }
+        });
+
+        if (!response.ok) {
+            console.error("Error response from web service", response.status, response.statusText);
+            throw new Error(`Failed to perform refresh: ${response.status} ${response.statusText}`);
+        }
+    }
 }
