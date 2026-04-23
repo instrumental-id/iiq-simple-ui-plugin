@@ -20,6 +20,7 @@
                             </Scripts>
                             <StyleSheets>
                                 <String>ui/css/sup-plugin.css</String>
+                                <String>ui/css/toastify.css</String>
                             </StyleSheets>
                         </Snippet>
                     </List>

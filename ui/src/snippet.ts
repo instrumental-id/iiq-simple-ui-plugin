@@ -1,4 +1,5 @@
 import {PluginService} from "./PluginService";
+import Toastify from "toastify-js";
 
 // This will be available at runtime
 declare var jQuery: any;
@@ -52,11 +53,38 @@ export class IIDSimpleUIPluginSnippet {
                     button.appendChild(buttonIcon);
                     button.appendChild(buttonLabel);
 
+
                     button.addEventListener("click", () => {
                         this.pluginService.performRefresh(buttonInfo.type, identityId).then(() => {
                             console.info(`Successfully performed refresh for type ${buttonInfo.type} and identity ${identityId}`);
+                            Toastify({
+                                text: `Successfully refreshed user! (type: ${buttonInfo.label})`,
+                                duration: 5000,
+                                newWindow: true,
+                                close: false,
+                                gravity: "top", // `top` or `bottom`
+                                position: "left", // `left`, `center` or `right`
+                                stopOnFocus: true,
+                                style: {
+                                    "background": "#073018",
+                                    "border": "1px solid #555",
+                                }
+                            }).showToast();
                         }).catch(error => {
                             console.error("Error performing refresh", error);
+                            Toastify({
+                                text: `An error occurred while refreshing: ${error.message})`,
+                                duration: 5000,
+                                newWindow: true,
+                                close: false,
+                                gravity: "top", // `top` or `bottom`
+                                position: "left", // `left`, `center` or `right`
+                                stopOnFocus: true,
+                                style: {
+                                    "background": "#4a0606",
+                                    "color": "#333"
+                                }
+                            }).showToast();
                         });
                     })
 
