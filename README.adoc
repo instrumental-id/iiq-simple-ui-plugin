@@ -1,3 +1,9 @@
 = Simple UI Plugin
 
 This repository contains the Simple UI Plugin demonstrated by Devin Rosenbauer at SailPoint's Developer Days 2026 conference. It provides a simple example of a user interface modification in SailPoint to make it more user-friendly.
+
+== Steps
+
+=== Step 1: Backend implementation
+
+This branch includes a first pass at the backend of this plugin, including some automated JUnit tests to verify functionality. It is not yet a working example, because the front-end remains to be implemented in the next step.
