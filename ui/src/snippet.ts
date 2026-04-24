@@ -34,25 +34,27 @@ export class IIDSimpleUIPluginSnippet {
             // Listen for backtick keypress
             document.addEventListener("keydown", (event) => {
                 if (event.key === "`") {
-                    event.preventDefault();
-                    this.pluginService.getIdentityXML(identityId).then(xmlResponse => {
-                        this.xmlModalService.showModal(xmlResponse);
-                    }).catch(error => {
-                        console.error("Error fetching identity XML", error);
-                        Toastify({
-                            text: `An error occurred while fetching identity XML: ${error.message}`,
-                            duration: 5000,
-                            newWindow: true,
-                            close: false,
-                            gravity: "top", // `top` or `bottom`
-                            position: "left", // `left`, `center` or `right`
-                            stopOnFocus: true,
-                            style: {
-                                "background": "#4a0606",
-                                "color": "#ddd"
-                            }
-                        }).showToast();
-                    });
+                    if (!this.xmlModalService.open) {
+                        event.preventDefault();
+                        this.pluginService.getIdentityXML(identityId).then(xmlResponse => {
+                            this.xmlModalService.showModal(xmlResponse);
+                        }).catch(error => {
+                            console.error("Error fetching identity XML", error);
+                            Toastify({
+                                text: `An error occurred while fetching identity XML: ${error.message}`,
+                                duration: 5000,
+                                newWindow: true,
+                                close: false,
+                                gravity: "top", // `top` or `bottom`
+                                position: "left", // `left`, `center` or `right`
+                                stopOnFocus: true,
+                                style: {
+                                    "background": "#4a0606",
+                                    "color": "#ddd"
+                                }
+                            }).showToast();
+                        });
+                    }
                 }
             });
         }

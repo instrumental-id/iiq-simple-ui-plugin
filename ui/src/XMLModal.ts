@@ -1,95 +1,122 @@
-import {XMLResponse} from "./PluginService";
+import {PluginService, XMLResponse} from "./PluginService";
+
+export type CloseCallback = () => void;
 
 export class XMLModal {
-    constructor(private parent: HTMLElement) {
+    private pluginService: PluginService;
 
+    private _open: boolean;
+
+    private openModalElement: HTMLElement | null;
+
+    constructor(private parent: HTMLElement) {
+        this.pluginService = new PluginService();
+        this._open = false;
+
+        this.openModalElement = null;
     }
 
-    showModal(xmlResponse: XMLResponse) {
+    private getElement(parent: HTMLElement, elementClass: string): HTMLElement | null {
+        const elements = parent.getElementsByClassName(elementClass)
+        if (elements.length > 0) {
+            return elements[0] as HTMLElement
+        } else {
+            return null;
+        }
+    }
+
+    get open(): boolean {
+        return this._open;
+    }
+
+    private close(closeCallback: CloseCallback | null = null) {
+        if (this.openModalElement) {
+            this.parent.removeChild(this.openModalElement);
+            this.openModalElement = null;
+            this._open = false;
+
+            if (closeCallback) {
+                closeCallback();
+            }
+        }
+    }
+
+    async showModal(xmlResponse: XMLResponse, closeCallback: CloseCallback | null = null) {
         // Create modal elements
-        const modalOverlay = document.createElement("div");
-        modalOverlay.style.position = "fixed";
-        modalOverlay.style.top = "0";
-        modalOverlay.style.left = "0";
-        modalOverlay.style.width = "100%";
-        modalOverlay.style.height = "100%";
-        modalOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-        modalOverlay.style.display = "flex";
-        modalOverlay.style.justifyContent = "center";
-        modalOverlay.style.alignItems = "center";
-        modalOverlay.style.zIndex = "10000";
+        // ARIA guidelines: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
 
+        // The gray background overlay
+        this.openModalElement = document.createElement("div");
+        this.openModalElement.classList.add("sup-modal-overlay");
+        this.openModalElement.role = "presentation";
+
+        // The actual modal content container. Must be ARIA role "dialog" and have aria-modal="true"
+        // for assistive technologies to recognize it as a modal dialog. It also must be
+        // described by something (which is set later).
         const modalContent = document.createElement("div");
-        modalContent.style.backgroundColor = "#fff";
-        modalContent.style.borderRadius = "8px";
-        modalContent.style.maxWidth = "80%";
-        modalContent.style.maxHeight = "80%";
-        modalContent.style.display = "flex";
-        modalContent.style.flexDirection = "column";
-        modalContent.style.overflow = "hidden";
+        modalContent.classList.add("sup-modal-content");
+        modalContent.role = "dialog";
+        modalContent.ariaLive = "polite";
+        modalContent.ariaModal = "true";
 
-        // Header
-        const modalHeader = document.createElement("div");
-        modalHeader.style.display = "flex";
-        modalHeader.style.alignItems = "center";
-        modalHeader.style.justifyContent = "space-between";
-        modalHeader.style.padding = "12px 20px";
-        modalHeader.style.borderBottom = "1px solid #ddd";
-        modalHeader.style.flexShrink = "0";
+        // Substitute the template content into the modal content container
+        modalContent.innerHTML = await this.pluginService.fetchTemplateContent("xml-modal.html");
 
-        const modalTitle = document.createElement("span");
-        modalTitle.textContent = "XML Response";
-        modalTitle.style.fontWeight = "bold";
-        modalTitle.style.fontSize = "16px";
+        // Gross modification of the template follows
 
-        const headerButtons = document.createElement("div");
-        headerButtons.style.display = "flex";
-        headerButtons.style.gap = "8px";
+        // Required for assistive tech to announce the dialog properly
+        const modalTitleElement = this.getElement(modalContent, "sup-modal-title");
+        if (modalTitleElement) {
+            modalContent.ariaDescribedByElements = [modalTitleElement];
+        }
 
-        const copyButton = document.createElement("button");
-        copyButton.textContent = "Copy to Clipboard";
-        copyButton.style.cursor = "pointer";
-        copyButton.addEventListener("click", () => {
-            navigator.clipboard.writeText(xmlResponse.strippedXml).then(() => {
-                copyButton.textContent = "Copied!";
-                setTimeout(() => { copyButton.textContent = "Copy to Clipboard"; }, 2000);
+        // Add the event handler to the copy button
+        const copyButton = this.getElement(modalContent, "sup-copy-button");
+        if (copyButton) {
+            copyButton.addEventListener("click", () => {
+                navigator.clipboard.writeText(xmlResponse.strippedXml).then(() => {
+                    copyButton.textContent = "Copied!";
+                    setTimeout(() => { copyButton.textContent = "Copy to Clipboard"; }, 2000);
+                });
             });
-        });
+        }
 
-        const closeButton = document.createElement("button");
-        closeButton.textContent = "Close";
-        closeButton.style.cursor = "pointer";
-        closeButton.addEventListener("click", () => {
-            this.parent.removeChild(modalOverlay);
-        });
+        // Add the event handler to the close button
+        const closeButton = this.getElement(modalContent, "sup-close-button");
+        if (closeButton) {
+            closeButton.addEventListener("click", () => {
+                this.close(closeCallback);
+            });
+        }
 
-        headerButtons.appendChild(copyButton);
-        headerButtons.appendChild(closeButton);
-        modalHeader.appendChild(modalTitle);
-        modalHeader.appendChild(headerButtons);
+        // Inject the XML content into the <pre> element in the modal
+        const pre = this.getElement(modalContent, "sup-xml-modal-content") as HTMLPreElement;
+        if (pre) {
+            pre.textContent = xmlResponse.xml;
+        }
 
-        // Body
-        const modalBody = document.createElement("div");
-        modalBody.style.padding = "20px";
-        modalBody.style.overflowY = "auto";
+        // Show it!
+        this.openModalElement.appendChild(modalContent);
+        this.parent.appendChild(this.openModalElement);
 
-        const pre = document.createElement("pre");
-        pre.textContent = xmlResponse.xml;
-        pre.style.whiteSpace = "pre";
-        pre.style.overflowX = "scroll";
-        pre.style.margin = "0";
+        this._open = true;
 
         // Clicking outside the modal content should also close the modal
-        modalOverlay.addEventListener("click", (event) => {
-            if (event.target === modalOverlay) {
-                this.parent.removeChild(modalOverlay);
+        this.openModalElement.addEventListener("click", (event) => {
+            if (event.target === this.openModalElement) {
+                this.close(closeCallback);
             }
         });
 
-        modalBody.appendChild(pre);
-        modalContent.appendChild(modalHeader);
-        modalContent.appendChild(modalBody);
-        modalOverlay.appendChild(modalContent);
-        this.parent.appendChild(modalOverlay);
+        // Allow closing the modal with the Escape key
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                document.removeEventListener("keydown", closeOnEscape);
+                this.close(closeCallback);
+                event.preventDefault()
+            }
+        };
+        document.addEventListener("keydown", closeOnEscape);
+
     }
 }

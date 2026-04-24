@@ -65,6 +65,23 @@ export class PluginService {
         }
     }
 
+    async fetchTemplateContent(filename: string): Promise<string> {
+        const sanitizedFilename = encodeURIComponent(filename);
+        let url = PluginHelper.getPluginFileUrl("IIDSimpleUIPlugin", "ui/templates/" + sanitizedFilename);
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "X-XSRF-TOKEN": this.getCookie(CSRF_COOKIE_NAME) ?? ""
+            }
+        });
+
+        if (response.ok) {
+            return await response.text();
+        } else {
+            return await this.parseErrorResponse(response);
+        }
+    }
+
     async getConfiguration(): Promise<Configuration> {
         const url = this.formatUrl("configuration");
         const response = await fetch(url, {

@@ -143,7 +143,7 @@ tasks.named("build").configure {
 
 tasks.register("installNodeDeps", Exec) {
     workingDir = file("${project.rootDir}/ui")
-    commandLine "npm", "ci"
+    commandLine "npm", "ci", "--ignore-scripts"
 }
 
 tasks.register("buildNode", Exec) {
@@ -170,6 +170,12 @@ tasks.register("createPluginZip", Zip) {
     into('ui/css') {
         from("ui/css") {
             include "*.css"
+        }
+    }
+
+    into('ui/templates') {
+        from ("ui/templates") {
+            include "**/*.html"
         }
     }
 
