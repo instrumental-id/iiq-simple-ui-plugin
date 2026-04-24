@@ -16,3 +16,7 @@ This branch includes a first pass at the front-end of this plugin. After this st
 image::docs/buttons-1.png["Buttons injected onto the Identity Warehouse page by the plugin]
 
 However, the code could stand to be further cleaned up, which happens in the next step.
+
+=== Step 3: Code cleanup
+
+This branch includes some code cleanup and refactoring to make modification of the plugin easier. It also adds auditing, metering, and other observability features to make the plugin more production-ready. 
