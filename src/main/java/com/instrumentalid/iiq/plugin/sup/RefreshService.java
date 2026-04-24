@@ -36,6 +36,24 @@ public class RefreshService {
     }
 
     /**
+     * Audit the refresh operation
+     * @param type the type of refresh button that was clicked
+     * @param targetIdentity the Identity that is being refreshed
+     * @param options the options selected for this type
+     */
+    protected void auditRefresh(String type, Identity targetIdentity, Attributes<String, Object> options) {
+        // Audit that this happened so we can report on it
+        AuditEvent ae = new AuditEvent();
+        ae.setAction("supRefreshIdentity");
+        ae.setTarget(targetIdentity.getName());
+        ae.setSource(loggedInUser.getName());
+        ae.setString1(type);
+        ae.setAttribute("options", options);
+
+        Auditor.log(ae);
+    }
+
+    /**
      * Fetches the SUPConfiguration for the logged in user. This will be used by the frontend
      * to determine which buttons to show.
      * @return the SUPConfiguration for the logged in user
@@ -80,6 +98,7 @@ public class RefreshService {
     public void refreshIdentity(String type, String targetIdentityId) throws GeneralException {
         var targetIdentity = context.getObject(Identity.class, targetIdentityId);
         if (targetIdentity == null) {
+            log.error("User " + loggedInUser.getName() + " attempted to refresh identity with id " + targetIdentityId + " but it was not found");
             throw new ObjectNotFoundException(Identity.class, targetIdentityId);
         }
 
@@ -98,15 +117,7 @@ public class RefreshService {
         refreshOptions.put(Identitizer.ARG_REFRESH_SOURCE, "webservice");
         refreshOptions.put(Identitizer.ARG_REFRESH_SOURCE_WHO, loggedInUser.getName());
 
-        // Audit that this happened so we can report on it
-        AuditEvent ae = new AuditEvent();
-        ae.setAction("supRefreshIdentity");
-        ae.setTarget(targetIdentity.getName());
-        ae.setSource(loggedInUser.getName());
-        ae.setString1(type);
-        ae.setAttribute("options", refreshOptions);
-
-        Auditor.log(ae);
+        auditRefresh(type, targetIdentity, refreshOptions);
 
         refreshIdentityInternal(targetIdentity, refreshOptions);
     }

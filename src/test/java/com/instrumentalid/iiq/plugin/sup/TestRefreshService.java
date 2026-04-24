@@ -104,6 +104,11 @@ public class TestRefreshService {
             }
 
             @Override
+            protected void auditRefresh(String type, Identity targetIdentity, Attributes<String, Object> options) {
+                // Do nothing
+            }
+
+            @Override
             protected void refreshIdentityInternal(Identity target, Attributes<String, Object> options) throws GeneralException {
                 optionsPassedToRefresh.set(options);
             }

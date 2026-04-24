@@ -14,6 +14,15 @@ export interface ButtonInfo {
     icon: string;
 }
 
+/**
+ * Corresponds to ErrorResponse on the server side
+ */
+export interface ErrorObject {
+    message: string;
+    exceptionClass: string;
+    stackTrace?: string;
+}
+
 export class PluginService {
 
     private getCookie(name: string): string | null {
@@ -23,6 +32,20 @@ export class PluginService {
 
     private formatUrl(path: string): string {
         return PluginHelper.getPluginRestUrl("simple-ui-plugin/" + path);
+    }
+
+    private async parseErrorResponse(response: Response): Promise<string | ErrorObject> {
+        const text = await response.text(); // always safe; returns "" if body is empty
+
+        if (!text) {
+            return `HTTP ${response.status}: ${response.statusText}`;
+        }
+
+        try {
+            return JSON.parse(text); // your rich error object, if it is one
+        } catch {
+            return text; // plain text fallback
+        }
     }
 
     async getConfiguration(): Promise<Configuration> {
@@ -37,8 +60,14 @@ export class PluginService {
         if (response.ok) {
             return await response.json() as Configuration;
         } else {
-            console.error("Error response from web service", response.status, response.statusText);
-            throw new Error(`Failed to fetch configuration: ${response.status} ${response.statusText}`);
+            let errorObject = await this.parseErrorResponse(response);
+            console.error("Error response from web service", response.status, response.statusText, errorObject);
+            if (typeof errorObject === "object" && "message" in errorObject) {
+                // If it's an ErrorObject, we can throw a more specific error
+                throw new Error(`Failed to fetch configuration: ${response.status} ${errorObject.message}`);
+            } else {
+                throw new Error(`Failed to fetch configuration: ${response.status} ${errorObject}`);
+            }
         }
     }
 
@@ -54,8 +83,14 @@ export class PluginService {
         });
 
         if (!response.ok) {
-            console.error("Error response from web service", response.status, response.statusText);
-            throw new Error(`Failed to perform refresh: ${response.status} ${response.statusText}`);
+            let errorObject = await this.parseErrorResponse(response);
+            console.error("Error response from web service", response.status, response.statusText, errorObject);
+            if (typeof errorObject === "object" && "message" in errorObject) {
+                // If it's an ErrorObject, we can throw a more specific error
+                throw new Error(`Failed to perform refresh: ${response.status} ${errorObject.message}`);
+            } else {
+                throw new Error(`Failed to perform refresh: ${response.status} ${errorObject}`);
+            }
         }
     }
 }
