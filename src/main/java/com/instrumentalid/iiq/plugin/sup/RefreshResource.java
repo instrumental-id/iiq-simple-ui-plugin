@@ -24,28 +24,12 @@ import javax.ws.rs.core.Response;
 public class RefreshResource extends BasePluginResource {
     private static final Log log = LogFactory.getLog(RefreshResource.class);
 
-    private static Response handleRequest(String meterString, RestMethodHandler handler) {
-        Meter.enterByName(meterString);
-        try {
-            var output = handler.handle();
-            if (output == null) {
-                return Response.ok().build();
-            } else {
-                return Response.ok(output).build();
-            }
-        } catch (Exception e) {
-            log.error("Error handling request", e);
-            return Response.serverError().entity(new ErrorResponse(e)).build();
-        } finally {
-            Meter.exitByName(meterString);
-        }
-    }
-
     @GET
     @Path("/configuration")
     @RequiredRight("IID_SUP_RefreshButtons")
     public Response fetchConfigurations() {
-        return handleRequest("SUP.fetchConfiguration", () -> {
+        // TODO: move this to its own resource
+        return Utils.handleRequest("SUP.fetchConfiguration", () -> {
             RefreshService service = new RefreshService(getContext(), getLoggedInUser(), this);
             return service.getConfigurations();
         });
@@ -56,7 +40,7 @@ public class RefreshResource extends BasePluginResource {
     @RequiredRight("IID_SUP_RefreshButtons")
     public Response handleRefreshButton(@PathParam("type") String type, @PathParam("targetIdentityId") String targetIdentityId) {
         var meterString = "SUP.refresh." + type;
-        return handleRequest(meterString, () -> {
+        return Utils.handleRequest(meterString, () -> {
             log.info("Logged in user " + getLoggedInUser().getName() + " is refreshing identity " + targetIdentityId + " using button type " + type);
             RefreshService service = new RefreshService(getContext(), getLoggedInUser(), this);
             service.refreshIdentity(type, targetIdentityId);

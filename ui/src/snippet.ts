@@ -1,14 +1,17 @@
 import {PluginService} from "./PluginService";
 import Toastify from "toastify-js";
+import {XMLModal} from "./XMLModal";
 
 // This will be available at runtime
 declare var jQuery: any;
 
 export class IIDSimpleUIPluginSnippet {
-    private pluginService: PluginService;
+    private readonly pluginService: PluginService;
+    private readonly xmlModalService: XMLModal;
 
     constructor() {
         this.pluginService = new PluginService();
+        this.xmlModalService = new XMLModal(document.body)
     }
 
     async findIdentityId() {
@@ -27,9 +30,35 @@ export class IIDSimpleUIPluginSnippet {
         const identityId = await this.findIdentityId();
         const configuration = await this.pluginService.getConfiguration();
 
-        console.log("Retrieved button configuration", configuration);
+        if (configuration.xmlVisible) {
+            // Listen for backtick keypress
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "`") {
+                    event.preventDefault();
+                    this.pluginService.getIdentityXML(identityId).then(xmlResponse => {
+                        this.xmlModalService.showModal(xmlResponse);
+                    }).catch(error => {
+                        console.error("Error fetching identity XML", error);
+                        Toastify({
+                            text: `An error occurred while fetching identity XML: ${error.message}`,
+                            duration: 5000,
+                            newWindow: true,
+                            close: false,
+                            gravity: "top", // `top` or `bottom`
+                            position: "left", // `left`, `center` or `right`
+                            stopOnFocus: true,
+                            style: {
+                                "background": "#4a0606",
+                                "color": "#ddd"
+                            }
+                        }).showToast();
+                    });
+                }
+            });
+        }
 
         if (configuration.buttons && configuration.buttons.length > 0) {
+            console.log("Retrieved button configuration", configuration.buttons);
             const elements = document.getElementById("appTable")?.getElementsByTagName("tr")
             if (elements) {
                 const insertionPoint = elements[0]
@@ -82,7 +111,6 @@ export class IIDSimpleUIPluginSnippet {
                                 stopOnFocus: true,
                                 style: {
                                     "background": "#4a0606",
-                                    "color": "#333"
                                 }
                             }).showToast();
                         });

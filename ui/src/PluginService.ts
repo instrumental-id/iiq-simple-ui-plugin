@@ -6,12 +6,19 @@ const CSRF_COOKIE_NAME = 'CSRF-TOKEN';
 
 export interface Configuration {
     buttons: ButtonInfo[]
+    xmlVisible: boolean;
 }
 
 export interface ButtonInfo {
     label: string;
     type: string;
     icon: string;
+}
+
+export interface XMLResponse {
+    strippedXml: string;
+    xml: string;
+    identityId: string;
 }
 
 /**
@@ -34,17 +41,27 @@ export class PluginService {
         return PluginHelper.getPluginRestUrl("simple-ui-plugin/" + path);
     }
 
-    private async parseErrorResponse(response: Response): Promise<string | ErrorObject> {
-        const text = await response.text(); // always safe; returns "" if body is empty
+    private async parseErrorResponse(response: Response): Promise<never> {
+        let text = await response.text(); // always safe; returns "" if body is empty
 
         if (!text) {
-            return `HTTP ${response.status}: ${response.statusText}`;
+            text = response.statusText;
         }
 
+        let errorObject;
+
         try {
-            return JSON.parse(text); // your rich error object, if it is one
+            errorObject = JSON.parse(text); // your rich error object, if it is one
         } catch {
-            return text; // plain text fallback
+            errorObject = text; // plain text fallback
+        }
+
+        console.error("Error response from web service", response.status, response.statusText, errorObject);
+        if (typeof errorObject === "object" && "message" in errorObject) {
+            // If it's an ErrorObject, we can throw a more specific error
+            throw new Error(`Failed to fetch identity XML: ${response.status} ${errorObject.message}`);
+        } else {
+            throw new Error(`Failed to fetch identity XML: ${response.status} ${errorObject}`);
         }
     }
 
@@ -60,14 +77,23 @@ export class PluginService {
         if (response.ok) {
             return await response.json() as Configuration;
         } else {
-            let errorObject = await this.parseErrorResponse(response);
-            console.error("Error response from web service", response.status, response.statusText, errorObject);
-            if (typeof errorObject === "object" && "message" in errorObject) {
-                // If it's an ErrorObject, we can throw a more specific error
-                throw new Error(`Failed to fetch configuration: ${response.status} ${errorObject.message}`);
-            } else {
-                throw new Error(`Failed to fetch configuration: ${response.status} ${errorObject}`);
+            return await this.parseErrorResponse(response);
+        }
+    }
+
+    async getIdentityXML(identityId: string): Promise<XMLResponse> {
+        const sanitizedIdentityId = encodeURIComponent(identityId);
+        const url = this.formatUrl("xml/" + sanitizedIdentityId + "?stripIdentifiers=true");
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "X-XSRF-TOKEN": this.getCookie(CSRF_COOKIE_NAME) ?? ""
             }
+        });
+        if (response.ok) {
+            return await response.json() as XMLResponse;
+        } else {
+            return await this.parseErrorResponse(response);
         }
     }
 
@@ -83,14 +109,7 @@ export class PluginService {
         });
 
         if (!response.ok) {
-            let errorObject = await this.parseErrorResponse(response);
-            console.error("Error response from web service", response.status, response.statusText, errorObject);
-            if (typeof errorObject === "object" && "message" in errorObject) {
-                // If it's an ErrorObject, we can throw a more specific error
-                throw new Error(`Failed to perform refresh: ${response.status} ${errorObject.message}`);
-            } else {
-                throw new Error(`Failed to perform refresh: ${response.status} ${errorObject}`);
-            }
+            return await this.parseErrorResponse(response);
         }
     }
 }

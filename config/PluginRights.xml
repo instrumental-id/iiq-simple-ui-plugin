@@ -5,10 +5,21 @@
         <Description>Allows this user to see any refresh buttons</Description>
     </SPRight>
 
+    <SPRight name="IID_SUP_IdentityXML" displayName="Simple UI Plugin: identity xml">
+        <Description>Allows this user to use the backtick-for-xml feature</Description>
+    </SPRight>
+
     <Capability name="IID_SUP_RefreshButtons" displayName="Simple UI Plugin: refresh buttons">
         <Description>Allows this user to see Identity Warehouse refresh buttons</Description>
         <RightRefs>
             <Reference class="sailpoint.object.SPRight" name="IID_SUP_RefreshButtons"/>
+        </RightRefs>
+    </Capability>
+
+    <Capability name="IID_SUP_IdentityXML" displayName="Simple UI Plugin: identity xml">
+        <Description>Allows this user to use the backtick-for-xml feature</Description>
+        <RightRefs>
+            <Reference class="sailpoint.object.SPRight" name="IID_SUP_IdentityXML"/>
         </RightRefs>
     </Capability>
 </sailpoint>

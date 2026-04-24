@@ -39,7 +39,9 @@ public class SUPConfiguration {
             }
         }
 
-        // TODO: handle other settings here if needed
+        if (loggedInUserRights != null && loggedInUserRights.contains("IID_SUP_IdentityXML")) {
+            configurations.setXmlVisible(true);
+        }
 
         return configurations;
     }
@@ -47,8 +49,12 @@ public class SUPConfiguration {
     @JsonProperty
     private final List<ButtonConfig> buttons;
 
+    @JsonProperty
+    private boolean xmlVisible;
+
     public SUPConfiguration() {
         this.buttons = new ArrayList<>();
+        this.xmlVisible = false;
     }
 
     public void addButton(ButtonConfig buttonConfig) {
@@ -57,5 +63,13 @@ public class SUPConfiguration {
 
     public List<ButtonConfig> getButtons() {
         return buttons;
+    }
+
+    public boolean isXmlVisible() {
+        return xmlVisible;
+    }
+
+    public void setXmlVisible(boolean xmlVisible) {
+        this.xmlVisible = xmlVisible;
     }
 }

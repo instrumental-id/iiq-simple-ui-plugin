@@ -8,6 +8,7 @@
                 <value>
                     <List>
                         <String>com.instrumentalid.iiq.plugin.sup.RefreshResource</String>
+                        <String>com.instrumentalid.iiq.plugin.sup.XMLResource</String>
                     </List>
                 </value>
             </entry>
