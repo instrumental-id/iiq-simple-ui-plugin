@@ -19,4 +19,16 @@ However, the code could stand to be further cleaned up, which happens in the nex
 
 === Step 3: Code cleanup
 
-This branch includes some code cleanup and refactoring to make modification of the plugin easier. It also adds auditing, metering, and other observability features to make the plugin more production-ready. 
+This branch includes some code cleanup and refactoring to make modification of the plugin easier. It also adds auditing, metering, and other observability features to make the plugin more production-ready.
+
+=== Step 4: Additional bonus feature - XML popup
+
+This branch includes an additional bonus feature that was not included in the original goals. When the user presses the backtick key while viewing an Identity in the Identity Warehouse, the XML representation of that Identity will be displayed in a modal dialog.
+
+Changes were made both the front-end and backend code to support this feature. The modal is represented by a template HTML file, loaded dynamically by the front-end at runtime.
+
+The user can copy the XML (minus any instance-specific identifiers) to their clipboard by clicking the "Copy to Clipboard" button.
+
+The user can close the modal by clicking outside of it, clicking the Close button, or pressing the Escape key.
+
+image::docs/fullscreen-xml-popup.png["XML popup feature in action]
