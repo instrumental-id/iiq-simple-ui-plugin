@@ -46,8 +46,9 @@ export class IIDSimpleUIPluginSnippet {
                 configuration.buttons.forEach(buttonInfo => {
                     const button = document.createElement("button");
                     const buttonIcon = document.createElement("i");
-                    const buttonLabel = document.createTextNode(buttonInfo.label);
+                    const buttonLabel = document.createTextNode(" " + buttonInfo.label);
                     buttonIcon.className = buttonInfo.icon;
+                    buttonIcon.ariaHidden = "true";
 
                     button.className = "btn btn-sm btn-secondary";
                     button.appendChild(buttonIcon);
