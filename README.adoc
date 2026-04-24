@@ -7,3 +7,12 @@ This repository contains the Simple UI Plugin demonstrated by Devin Rosenbauer a
 === Step 1: Backend implementation
 
 This branch includes a first pass at the backend of this plugin, including some automated JUnit tests to verify functionality. It is not yet a working example, because the front-end remains to be implemented in the next step.
+
+=== Step 2: Front-end implementation
+
+This branch includes a first pass at the front-end of this plugin. After this step, the plugin should be functional and ready for use as pictured here:
+
+.Buttons injected onto the Identity Warehouse page by the plugin
+image::docs/buttons-1.png["Buttons injected onto the Identity Warehouse page by the plugin]
+
+However, the code could stand to be further cleaned up, which happens in the next step.
