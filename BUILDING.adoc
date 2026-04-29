@@ -1,0 +1,8 @@
+= Setup of the project
+
+Before you can build the project, you need the following prerequisites installed:
+
+* Java 11 or 17. (Java 21 is not supported and will fail to compile.)
+* NodeJS version 20.
+
+Additionally, you must copy `identityiq.jar` and `connector-bundle-identityiq.jar` from your SailPoint IIQ installation to the `lib/sailpoint` directory in this project. These files are proprietary and must be excluded from public source code repositories.
