@@ -1,10 +1,17 @@
 = Simple UI Plugin
+:doctype: book
 
 This repository contains the Simple UI Plugin demonstrated by Devin Rosenbauer at SailPoint's Developer Days 2026 conference. It provides a simple example of a user interface modification in SailPoint to make it more user-friendly.
 
-See the link:./BUILDING.adoc[BUILDING.adoc] file for instructions on how to set up and build the project.
+The PowerPoint slide deck for Devin's presentation is available in the `docs` folder.
 
-There are four additional branches in this repository, each beginning with `step` (e.g., `step/1/...`). These branches contain the code for each of the steps demonstrated during the presentation at Developer Days.
+include::BUILDING.adoc[leveloffset=+1]
+
+== Branches
+
+The `main` branch contains the feature-complete plugin as demonstrated by the end of the Developer Days talk. This branch is intended to be used as a reference implementation for anyone looking to build their own UI plugin.
+
+There are five additional branches in this repository, each beginning with `step` (e.g., `step/0/...`, `step/1/...`). These branches contain the code for each of the steps demonstrated during the presentation at Developer Days. (Step 0 was previously `main`, but was renamed to make it easier to follow along.)
 
 == Steps
 
