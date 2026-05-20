@@ -3,6 +3,8 @@
 
 This repository contains the Simple UI Plugin demonstrated by Devin Rosenbauer at SailPoint's Developer Days 2026 conference. It provides a simple example of a user interface modification in SailPoint to make it more user-friendly.
 
+Instrumental Identity sells a commercial product, the link:https://instrumentalidentity.com/software-2/id-iq-plugins/ui-enhancer-plugin/[IIQ UI Enhancer Plugin], which provides this functionality and vastly more. This plugin was also demonstrated during the DevDays talk.
+
 The PowerPoint slide deck for Devin's presentation is available in the `docs` folder.
 
 include::BUILDING.adoc[leveloffset=+1]
