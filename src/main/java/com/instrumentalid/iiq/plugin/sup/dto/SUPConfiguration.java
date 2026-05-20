@@ -4,16 +4,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonProperty;
 import sailpoint.object.Configuration;
-import sailpoint.object.Identity;
+import sailpoint.tools.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SUPConfiguration {
     private static final Log logger = LogFactory.getLog(SUPConfiguration.class);
 
-    public static SUPConfiguration create(Configuration config, Identity loggedInUser) {
+    public static SUPConfiguration create(Configuration config, Set<String> loggedInUserRights) {
         var configurations = new SUPConfiguration();
 
         Object configButtonsObj = config.get("Refresh Buttons");
@@ -21,19 +22,26 @@ public class SUPConfiguration {
             List<Map<String, Object>> buttons = (List<Map<String, Object>>) configButtonsObj;
             for (Map<String, Object> buttonEntry : buttons) {
                 var buttonConfig = new ButtonConfig(buttonEntry);
-                if (loggedInUser == null) {
+                if (loggedInUserRights == null) {
                     configurations.addButton(buttonConfig);
                 } else {
-                    if (buttonConfig.isUserAllowed(loggedInUser)) {
-                        configurations.addButton(buttonConfig);
+                    if (Util.isNotNullOrEmpty(buttonConfig.getRightRequired())) {
+                        if (loggedInUserRights.contains(buttonConfig.getRightRequired())) {
+                            configurations.addButton(buttonConfig);
+                        } else {
+                            logger.debug(String.format("User does not have right %s required to see button %s", buttonConfig.getRightRequired(), buttonConfig.getLabel()));
+                        }
                     } else {
-                        logger.debug("User " + loggedInUser.getName() + " is not allowed to see button " + buttonConfig.getLabel());
+                        // Anybody can see this button
+                        configurations.addButton(buttonConfig);
                     }
                 }
             }
         }
 
-        // TODO: handle other settings here if needed
+        if (loggedInUserRights != null && loggedInUserRights.contains("IID_SUP_IdentityXML")) {
+            configurations.setXmlVisible(true);
+        }
 
         return configurations;
     }
@@ -41,8 +49,12 @@ public class SUPConfiguration {
     @JsonProperty
     private final List<ButtonConfig> buttons;
 
+    @JsonProperty
+    private boolean xmlVisible;
+
     public SUPConfiguration() {
         this.buttons = new ArrayList<>();
+        this.xmlVisible = false;
     }
 
     public void addButton(ButtonConfig buttonConfig) {
@@ -51,5 +63,13 @@ public class SUPConfiguration {
 
     public List<ButtonConfig> getButtons() {
         return buttons;
+    }
+
+    public boolean isXmlVisible() {
+        return xmlVisible;
+    }
+
+    public void setXmlVisible(boolean xmlVisible) {
+        this.xmlVisible = xmlVisible;
     }
 }

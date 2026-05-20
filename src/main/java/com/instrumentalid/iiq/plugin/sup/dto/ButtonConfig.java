@@ -31,7 +31,7 @@ public class ButtonConfig {
         this.type = Util.otoa(Util.get(entry, "type"));
         this.icon = Util.otoa(Util.get(entry, "icon"));
         this.rightRequired = Util.otoa(Util.get(entry, "rightRequired"));
-        this.options = Util.otom(Util.get(entry, "options"));
+        this.options = Util.otom(Util.get(entry, "refreshOptions"));
     }
 
     public String getIcon() {
@@ -52,10 +52,5 @@ public class ButtonConfig {
 
     public String getType() {
         return type;
-    }
-
-    public boolean isUserAllowed(Identity user) {
-        // TODO
-        return false;
     }
 }
